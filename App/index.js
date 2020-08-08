@@ -6,7 +6,7 @@ window.onload = function() {
             document.getElementById('urlbox').value,
             document.getElementById('external-preview')
         )
-        setTimeout( () => generateLevel(), 50 )
+        setTimeout( () => generateLevel(), 1000 )
     })
 }
 
@@ -120,7 +120,6 @@ function generateLevel() {
     }
     // This function will be called when a key on the keyboard is pressed
     function keydown(e) {
-        e.preventDefault()
         // 37 is the code for the left arrow key
         if(e.keyCode == 37)
             keys.left = true;
@@ -134,7 +133,6 @@ function generateLevel() {
     }
     // This function is called when the pressed key is released
     function keyup(e) {
-        e.preventDefault()
         if(e.keyCode == 37) 
             keys.left = false
         if(e.keyCode == 38)
