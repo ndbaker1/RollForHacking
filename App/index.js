@@ -1,14 +1,13 @@
 
 // Button Listeners for initial page load
 window.onload = function() {
-    document.getElementById('load-preview').addEventListener('click', () => {
+    document.getElementById('load-level').addEventListener('click', () => {
         loadPreviewSite(
             document.getElementById('urlbox').value,
             document.getElementById('external-preview')
         )
+        setTimeout( () => generateLevel(), 50 )
     })
-
-    document.getElementById('load-level').addEventListener('click', () => generateLevel() )
 }
 
 function loadPreviewSite(url, sitePreviewElement) {
@@ -183,8 +182,8 @@ function generateLevel() {
     ctx.canvas.height = canvasHeight;
     ctx.canvas.width = canvasWidth;
     // Adding the event listeners
-    document.addEventListener("keydown",keydown);
-    document.addEventListener("keyup",keyup);
+    document.addEventListener("keydown", keydown);
+    document.addEventListener("keyup", keyup);
     gameLoop = setInterval(loop, 20);
 }
 
