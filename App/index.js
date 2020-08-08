@@ -2,19 +2,30 @@
 // Button Listeners for initial page load
 window.onload = function() {
     document.getElementById('load-level').addEventListener('click', () => {
-        loadPreviewSite(
-            document.getElementById('urlbox').value,
-            document.getElementById('external-preview')
-        )
+        loadPreviewSite( urlInputValue(), frameDocument() )
         setTimeout( () => generateLevel(), 3000 )
     })
+    document.getElementById('urlbox').addEventListener('keydown', (event) => {
+        if (event.keyCode == 13){
+            loadPreviewSite( urlInputValue(), frameDocument() )
+            setTimeout( () => generateLevel(), 3000 )
+        }
+    })
+}
+
+gameViewport = () => {  return document.getElementById("viewport-container") }
+urlInputValue = () => { return document.getElementById('urlbox').value }
+previewFrame = () => {  return document.getElementById("site-preview-frame") }
+frameDocument = () => {
+    let frame = previewFrame()
+    return (frame.contentDocument || frame.contentWindow.document);
 }
 
 function getDOMLinks(DOM) {
     return [].map.call(DOM.getElementsByTagName('a'), elem => elem.href.substring(7))
 }
 
-function loadPreviewSite(url, sitePreviewElement) {
+function loadPreviewSite(url, siteFrame) {
     // making request to get DOM of external url
     const xmlhttp = new XMLHttpRequest()
     // listener/callback for an xmlhttp response
@@ -23,13 +34,17 @@ function loadPreviewSite(url, sitePreviewElement) {
         if (this.readyState == 4 && this.status == 200) {
             // parse the incoming page into a DOM object
             const parser = new DOMParser();
-            const externalDocument = parser.parseFromString(this.responseText,"text/html")
-            
+            const externalDOM = parser.parseFromString(this.responseText,"text/html")
             // empty the container and put attach the new site data
-            sitePreviewElement.innerHTML = ''
-            sitePreviewElement.appendChild(externalDocument.head)
-            sitePreviewElement.appendChild(externalDocument.body)
-            links = getDOMLinks(sitePreviewElement)
+            let frameElement = previewFrame()
+            frameElement.style.display = 'block'
+
+            siteFrame.head.innerHTML = externalDOM.head.innerHTML
+            siteFrame.body = externalDOM.body
+
+            frameElement.style.height = siteFrame.body.scrollHeight + 'px';
+
+            links = getDOMLinks(frameDocument)
             nextlink = links[Math.floor(Math.random()*links.length)]
         }
     }
@@ -38,8 +53,9 @@ function loadPreviewSite(url, sitePreviewElement) {
     xmlhttp.send();   
 }
 
+
 // parses the current preview site container into an array of playforms
-function parseCurrentSite(sitePreviewElement) {
+function parseCurrentSite(siteFrame) {
     const levelPlatforms = []
     // recursive DOM crawling parse algorithm
     function parseDOM(elem) {
@@ -56,7 +72,7 @@ function parseCurrentSite(sitePreviewElement) {
         }
     }
     // start parsong on the body of the preview container
-    parseDOM(sitePreviewElement.childNodes[1])
+    parseDOM(siteFrame.body)
     return levelPlatforms
 }
 
@@ -66,18 +82,21 @@ function generateLevel() {
     // clear the previous drawing loop
     clearInterval(gameLoop)
     // The platforms
-    let container = document.getElementById('external-preview')
+    let container = frameDocument()
     let platforms = parseCurrentSite(container)
-    let canvasWidth = container.clientWidth,
-        canvasHeight = container.clientHeight
+    let canvasWidth = container.body.clientWidth,
+        canvasHeight = container.body.clientHeight
     // cleanup site preview
-    container.innerHTML = ''
+    let frameElement = previewFrame()
+    container.body.innerHTML = ''
+    frameElement.style.height = '0px';
+    frameElement.style.display = 'none';
     // spawn a bottom bounds platform
     platforms.push({
         x: 0,
         y: canvasHeight-50,
         width: canvasWidth,
-        height: 50
+        height: 200
     })
     // The attributes of the player.
     var player = {
@@ -88,6 +107,10 @@ function generateLevel() {
         jump : true,
         height: 80,
         width: 80
+    }
+
+    var camera = {
+        pos: canvasHeight
     }
     // The status of the arrow keys
     var keys = {
@@ -123,6 +146,7 @@ function generateLevel() {
             )
         }
     }
+
     function update() {
         //PLAYER MOVEMENT
         // If the player is not jumping apply the effect of frictiom
@@ -148,8 +172,10 @@ function generateLevel() {
 
         player.y += player.y_v;
         player.x += player.x_v;
+
+        camera.pos += ( player.y -400 - camera.pos )/10
         // Update the position of the camera relative to the player
-        viewport = document.getElementById("viewport-div").scrollTo(player.x ,player.y - 400);
+        gameViewport().scrollTo(0, camera.pos);
         // A simple code that checks for collions with the platform
         let i = -1;
         for (let k = 0; k < platforms.length; k++){
@@ -164,6 +190,7 @@ function generateLevel() {
             player.y = platforms[i].y - player.height;
         }
     }
+
     function keydown(e) {
         // 37 is the code for the left arrow key
         if(e.keyCode == 37)
@@ -176,6 +203,7 @@ function generateLevel() {
         if(e.keyCode == 39) 
             keys.right = true;
     }
+
     function keyup(e) {
         if(e.keyCode == 37) 
             keys.left = false
@@ -185,9 +213,8 @@ function generateLevel() {
         if(e.keyCode == 39) 
             keys.right = false;
     }
+
     function loop() {
-        
-        
         // update logic and collisions
         update()
         // Rendering the compoenents to the screen
@@ -201,6 +228,7 @@ function generateLevel() {
     // Add event listeners for controls
     document.addEventListener("keydown", keydown);
     document.addEventListener("keyup", keyup);
+    // start the game loop
     gameLoop = setInterval(loop, 20);
 }
 
