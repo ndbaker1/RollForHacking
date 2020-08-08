@@ -12,10 +12,14 @@
     padding: 12px;
     background-color: slateblue;
     color: white;
+} 
+
+#viewport-div{
+    overflow-y: auto;
+    height: 80vh;
 }
 
-
-canvas {
+#canvas {
     padding-top: 20px;
     margin: auto;
     display: block;

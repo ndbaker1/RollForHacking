@@ -6,7 +6,7 @@ window.onload = function() {
             document.getElementById('urlbox').value,
             document.getElementById('external-preview')
         )
-        setTimeout( () => generateLevel(), 1000 )
+        setTimeout( () => generateLevel(), 2000 )
     })
 }
 
@@ -27,6 +27,7 @@ function loadPreviewSite(url, sitePreviewElement) {
             sitePreviewElement.appendChild(externalDocument.body)
         }
     }
+    // Get around CORS
     xmlhttp.open("GET", 'https://cors-anywhere.herokuapp.com/'+url);
     xmlhttp.send();   
 }
@@ -62,7 +63,7 @@ function generateLevel() {
     let container = document.getElementById('external-preview')
     let platforms = parseCurrentSite(container)
     let canvasWidth = window.innerWidth*.95,
-        canvasHeight = window.innerHeight*.85
+        canvasHeight = window.innerHeight*3
     // cleanup site preview
     container.innerHTML = ''
     // spawn a bottom bounds platform
