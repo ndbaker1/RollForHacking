@@ -1,0 +1,9 @@
+.navigation input {
+    padding: 10px
+} 
+.navigation button{
+    border: none;
+    padding: 12px;
+    background-color: slateblue;
+    color: white;
+}
