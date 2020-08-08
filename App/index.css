@@ -33,10 +33,15 @@
     height: 80vh;
     width: 95vw;
     box-shadow: grey 0 0 10px;
+    background-color:white;
 }
 
 #site-preview-frame {
     margin: auto;
     width: 100%;
     display: none;
+}
+
+body {
+    background-color: #b3efd1;
 }
