@@ -18,12 +18,12 @@
     border: none;
     padding: 12px;
     font-weight: 700;
-    background-color: slategray;
+    background-color: #736CED;
     color: white;
     outline: none;
     transition: ease 0.3s;
 }.navigation button:hover {
-    background-color: gray;
+    background-color: #5149e9;
     cursor: pointer;
 }.navigation button:active {
     transform: scale(0.95);

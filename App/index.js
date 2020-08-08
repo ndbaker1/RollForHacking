@@ -10,6 +10,10 @@ window.onload = function() {
     })
 }
 
+function getDOMLinks(DOM) {
+    return [].map.call(DOM.getElementsByTagName('a'), elem => elem.href.substring(7))
+}
+
 function loadPreviewSite(url, sitePreviewElement) {
     // making request to get DOM of external url
     const xmlhttp = new XMLHttpRequest()
@@ -25,6 +29,8 @@ function loadPreviewSite(url, sitePreviewElement) {
             sitePreviewElement.innerHTML = ''
             sitePreviewElement.appendChild(externalDocument.head)
             sitePreviewElement.appendChild(externalDocument.body)
+            linksInDOM = getDOMLinks(sitePreviewElement)
+            nextlink = linksInDOM[Math.floor(Math.random()*linksInDOM.length)]
         }
     }
     // Get around CORS
@@ -45,7 +51,7 @@ function parseCurrentSite(sitePreviewElement) {
             }
         // if the element is too small do not consider it 
         // add in am element of randomness to make it unique
-        } else if ( rect.width > 20 && rect.height > 20 && Math.random() < 0.6 ) {
+        } else if ( rect.width > 20 && rect.height > 20 && Math.random() < 0.8 ) {
             levelPlatforms.push(rect)
         }
     }
@@ -54,7 +60,7 @@ function parseCurrentSite(sitePreviewElement) {
     return levelPlatforms
 }
 
-
+var nextlink // goal trigger
 var gameLoop
 function generateLevel() {
     // clear the previous drawing loop
@@ -95,7 +101,7 @@ function generateLevel() {
     // Function to render the canvas
     function rendercanvas(){
         ctx.fillStyle = "#F0F8FF"
-        ctx.fillRect(0, 0, canvasWidth, 3000)
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight)
     }
     // Function to render the player
     function renderplayer(){
@@ -121,6 +127,7 @@ function generateLevel() {
     }
     // This function will be called when a key on the keyboard is pressed
     function keydown(e) {
+        getDOMLinks()
         // 37 is the code for the left arrow key
         if(e.keyCode == 37)
             keys.left = true;
@@ -170,7 +177,7 @@ function generateLevel() {
         }
         if (i > -1){
             player.jump = false;
-            player.y = platforms[i].y;    
+            player.y = platforms[i].y;
         }
         // Rendering the canvas, the player and the platforms
         rendercanvas();
