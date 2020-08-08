@@ -12,6 +12,7 @@
     padding: 10px;
     width: 50%;
     outline: none;
+    border-radius: 10px;
 } 
 .navigation button {
     width: 10%;
@@ -22,6 +23,7 @@
     color: white;
     outline: none;
     transition: ease 0.3s;
+    border-radius: 10px;
 }.navigation button:hover {
     background-color: #5149e9;
     cursor: pointer;
