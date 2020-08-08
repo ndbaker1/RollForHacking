@@ -6,7 +6,7 @@ window.onload = function() {
             document.getElementById('urlbox').value,
             document.getElementById('external-preview')
         )
-        setTimeout( () => generateLevel(), 2000 )
+        setTimeout( () => generateLevel(), 3000 )
     })
 }
 
@@ -29,8 +29,8 @@ function loadPreviewSite(url, sitePreviewElement) {
             sitePreviewElement.innerHTML = ''
             sitePreviewElement.appendChild(externalDocument.head)
             sitePreviewElement.appendChild(externalDocument.body)
-            linksInDOM = getDOMLinks(sitePreviewElement)
-            nextlink = linksInDOM[Math.floor(Math.random()*linksInDOM.length)]
+            links = getDOMLinks(sitePreviewElement)
+            nextlink = links[Math.floor(Math.random()*links.length)]
         }
     }
     // Get around CORS
@@ -61,7 +61,7 @@ function parseCurrentSite(sitePreviewElement) {
 }
 
 var nextlink // goal trigger
-var gameLoop
+var gameLoop // game interval timer
 function generateLevel() {
     // clear the previous drawing loop
     clearInterval(gameLoop)
@@ -86,8 +86,8 @@ function generateLevel() {
         x_v: 0,
         y_v: 0,
         jump : true,
-        height: 20,
-        width: 20
+        height: 80,
+        width: 80
     }
     // The status of the arrow keys
     var keys = {
@@ -96,15 +96,14 @@ function generateLevel() {
         up: false,
     }
     // The friction and gravity to show realistic movements
-    var gravity = 0.6
+    var gravity = 1
     var friction = 0.7
-    // Function to render the canvas
-    function rendercanvas(){
+
+    // Function to render
+    function render(){
         ctx.fillStyle = "#F0F8FF"
         ctx.fillRect(0, 0, canvasWidth, canvasHeight)
-    }
-    // Function to render the player
-    function renderplayer(){
+
         ctx.fillStyle = "#F08080";
         ctx.fillRect(
             player.x,
@@ -112,9 +111,6 @@ function generateLevel() {
             player.width,
             player.height
         )
-    }
-    // Function to render platforms
-    function renderplat(){
         ctx.fillStyle = "#45597E";
         for (let i = 0; i < platforms.length; i++){
             ctx.fillRect(
@@ -125,32 +121,7 @@ function generateLevel() {
             )
         }
     }
-    // This function will be called when a key on the keyboard is pressed
-    function keydown(e) {
-        getDOMLinks()
-        // 37 is the code for the left arrow key
-        if(e.keyCode == 37)
-            keys.left = true;
-        // 37 is the code for the up arrow key
-        if(e.keyCode == 38)
-            if(player.jump == false)
-                player.y_v = -10;
-        // 39 is the code for the right arrow key
-        if(e.keyCode == 39) 
-            keys.right = true;
-    }
-    // This function is called when the pressed key is released
-    function keyup(e) {
-        if(e.keyCode == 37) 
-            keys.left = false
-        if(e.keyCode == 38)
-            if(player.y_v < -2)
-                player.y_v = -3;
-        if(e.keyCode == 39) 
-            keys.right = false;
-    } 
-    function loop() {
-        window.scrollTo(player.x, player.y)
+    function update() {
         // If the player is not jumping apply the effect of frictiom
         if(player.jump == false)
             player.x_v *= friction;
@@ -160,35 +131,61 @@ function generateLevel() {
         player.jump = true;
         // If the left key is pressed increase the relevant horizontal velocity
         if(keys.left)
-            player.x_v = -2.5;
+            player.x_v = -5;
         if(keys.right)
-            player.x_v = 2.5;
+            player.x_v = 5;
         // Updating the y and x coordinates of the player
         player.y += player.y_v;
         player.x += player.x_v;
         // A simple code that checks for collions with the platform
         let i = -1;
         for (let k = 0; k < platforms.length; k++){
-            if( platforms[k].x < player.x && player.x < platforms[k].x + platforms[k].width &&
-                platforms[k].y < player.y && player.y < platforms[k].y + platforms[k].height){
-                i = k
-                break
+            if( platforms[k].x < player.x + player.width && player.x < platforms[k].x + platforms[k].width &&
+                platforms[k].y < player.y + player.height && player.y < platforms[k].y + platforms[k].height){
+                i = k;
+                break;
             }
         }
         if (i > -1){
             player.jump = false;
-            player.y = platforms[i].y;
+            player.y = platforms[i].y - player.height;
         }
-        // Rendering the canvas, the player and the platforms
-        rendercanvas();
-        renderplayer();
-        renderplat();
     }
-    canvas = document.getElementById("canvas");
+    function keydown(e) {
+        // 37 is the code for the left arrow key
+        if(e.keyCode == 37)
+            keys.left = true;
+        // 37 is the code for the up arrow key
+        if(e.keyCode == 38)
+            if(player.jump == false)
+                player.y_v = -20;
+        // 39 is the code for the right arrow key
+        if(e.keyCode == 39) 
+            keys.right = true;
+    }
+    function keyup(e) {
+        if(e.keyCode == 37) 
+            keys.left = false
+        if(e.keyCode == 38)
+            if(player.y_v < -2)
+                player.y_v = -5;
+        if(e.keyCode == 39) 
+            keys.right = false;
+    }
+    function loop() {
+        
+        
+        // update logic and collisions
+        update()
+        // Rendering the compoenents to the screen
+        render()
+    }
+    // Set configurations for canvas
+    canvas = document.getElementById("game-level-canvas");
     ctx = canvas.getContext("2d");
     ctx.canvas.height = canvasHeight;
     ctx.canvas.width = canvasWidth;
-    // Adding the event listeners
+    // Add event listeners for controls
     document.addEventListener("keydown", keydown);
     document.addEventListener("keyup", keyup);
     gameLoop = setInterval(loop, 20);
