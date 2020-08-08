@@ -24,7 +24,7 @@ var platforms = [];
 // Function to render the canvas
 function rendercanvas(){
     ctx.fillStyle = "#F0F8FF";
-    ctx.fillRect(0, 0, 270, 270);
+    ctx.fillRect(0, 0, 1000, 1000);
 }
 // Function to render the player
 function renderplayer(){
@@ -122,8 +122,8 @@ function loop() {
 }
 canvas=document.getElementById("canvas");
 ctx=canvas.getContext("2d");
-ctx.canvas.height = 270;
-ctx.canvas.width = 270;
+ctx.canvas.height = 1000;
+ctx.canvas.width = 1000;
 createplat();
 // Adding the event listeners
 document.addEventListener("keydown",keydown);
