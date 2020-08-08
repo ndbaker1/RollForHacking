@@ -137,6 +137,8 @@ function generateLevel() {
         // Updating the y and x coordinates of the player
         player.y += player.y_v;
         player.x += player.x_v;
+        // Update the position of the camera relative to the player
+        viewport = document.getElementById("viewport-div").scrollTo(player.x ,player.y - 400);
         // A simple code that checks for collions with the platform
         let i = -1;
         for (let k = 0; k < platforms.length; k++){
