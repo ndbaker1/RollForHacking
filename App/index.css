@@ -1,22 +1,40 @@
+#body-origin {
+
+}
 
 .nav-box {
-    padding: 20px;
+    padding: 15px;
+}
+.navigation {
+    text-align: center;
 }
 .navigation input {
     padding: 10px;
-
+    width: 50%;
+    outline: none;
 } 
-.navigation button{
+.navigation button {
     width: 10%;
     border: none;
     padding: 12px;
-    background-color: slateblue;
+    font-weight: 700;
+    background-color: slategray;
     color: white;
-} 
+    outline: none;
+    transition: ease 0.3s;
+}.navigation button:hover {
+    background-color: gray;
+    cursor: pointer;
+}.navigation button:active {
+    transform: scale(0.95);
+}
 
 #viewport-div{
     overflow-y: auto;
-    height: 80vh;
+    margin: auto;
+    width: 95vw;
+    height: 85vh;
+    box-shadow: grey 0 0 10px;
 }
 
 #canvas {

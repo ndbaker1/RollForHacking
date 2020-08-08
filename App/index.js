@@ -62,8 +62,8 @@ function generateLevel() {
     // The platforms
     let container = document.getElementById('external-preview')
     let platforms = parseCurrentSite(container)
-    let canvasWidth = window.innerWidth*.95,
-        canvasHeight = window.innerHeight*3
+    let canvasWidth = container.clientWidth,
+        canvasHeight = container.clientHeight
     // cleanup site preview
     container.innerHTML = ''
     // spawn a bottom bounds platform
@@ -143,6 +143,7 @@ function generateLevel() {
             keys.right = false;
     } 
     function loop() {
+        window.scrollTo(player.x, player.y)
         // If the player is not jumping apply the effect of frictiom
         if(player.jump == false)
             player.x_v *= friction;
