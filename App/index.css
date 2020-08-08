@@ -14,9 +14,6 @@
     color: white;
 }
 
-#external-preview {
-    transform: translateX(-100%);
-}
 
 canvas {
     padding-top: 20px;
