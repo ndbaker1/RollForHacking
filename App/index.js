@@ -1,20 +1,21 @@
+const PAGE_LOAD_TIME = 5000 // milliseconds
 
 // Button Listeners for initial page load
 window.onload = function() {
     document.getElementById('load-level').addEventListener('click', () => {
-        loadPreviewSite( urlInputValue(), frameDocument() )
-        setTimeout( () => generateLevel(), 3000 )
+        loadPreviewSite( urlInput().value, frameDocument() )
     })
     document.getElementById('urlbox').addEventListener('keydown', (event) => {
         if (event.keyCode == 13){
-            loadPreviewSite( urlInputValue(), frameDocument() )
-            setTimeout( () => generateLevel(), 3000 )
+            loadPreviewSite( urlInput().value, frameDocument() )
         }
     })
 }
 
+// element getters
+loader = () => { return document.getElementById('parsing-loader') }
 gameViewport = () => {  return document.getElementById("viewport-container") }
-urlInputValue = () => { return document.getElementById('urlbox').value }
+urlInput = () => { return document.getElementById('urlbox') }
 previewFrame = () => {  return document.getElementById("site-preview-frame") }
 frameDocument = () => {
     let frame = previewFrame()
@@ -22,10 +23,18 @@ frameDocument = () => {
 }
 
 function getDOMLinks(DOM) {
-    return [].map.call(DOM.getElementsByTagName('a'), elem => elem.href.substring(7))
+    console.log(DOM)
+    const links = [].map.call(DOM.getElementsByTagName('a'), elem => elem.href)
+    return links.filter(link => !link.includes('file'))
 }
 
-function loadPreviewSite(url, siteFrame) {
+function loadPreviewSite(url, frameDocument) {
+    // change visibility of loader and blur site
+    loader().style.display = 'inline-block'
+    previewFrame().style.filter = 'blur(3px) brightness(0.8)'
+    clearInterval(gameLoop)
+    if (canvas !== undefined) canvas.style.display = 'none'
+
     // making request to get DOM of external url
     const xmlhttp = new XMLHttpRequest()
     // listener/callback for an xmlhttp response
@@ -35,17 +44,16 @@ function loadPreviewSite(url, siteFrame) {
             // parse the incoming page into a DOM object
             const parser = new DOMParser();
             const externalDOM = parser.parseFromString(this.responseText,"text/html")
-            // empty the container and put attach the new site data
+
+            //  attach the new site data
             let frameElement = previewFrame()
             frameElement.style.display = 'block'
+            frameDocument.head.innerHTML = externalDOM.head.innerHTML
+            frameDocument.body = externalDOM.body
+            frameElement.style.height = frameDocument.body.scrollHeight + 'px';
 
-            siteFrame.head.innerHTML = externalDOM.head.innerHTML
-            siteFrame.body = externalDOM.body
-
-            frameElement.style.height = siteFrame.body.scrollHeight + 'px';
-
-            links = getDOMLinks(frameDocument)
-            nextlink = links[Math.floor(Math.random()*links.length)]
+            // wait for page to load befoer going on
+            setTimeout( () => generateLevel(), PAGE_LOAD_TIME )
         }
     }
     // Get around CORS
@@ -55,7 +63,7 @@ function loadPreviewSite(url, siteFrame) {
 
 
 // parses the current preview site container into an array of playforms
-function parseCurrentSite(siteFrame) {
+function parseCurrentSite(frameDocumentBody) {
     const levelPlatforms = []
     // recursive DOM crawling parse algorithm
     function parseDOM(elem) {
@@ -68,59 +76,95 @@ function parseCurrentSite(siteFrame) {
         // if the element is too small do not consider it 
         // add in am element of randomness to make it unique
         } else if ( rect.width > 20 && rect.height > 20 && Math.random() < 0.8 ) {
-            levelPlatforms.push(rect)
+            levelPlatforms.push({
+                x: rect.x,
+                y: rect.y + 200,
+                width: rect.width,
+                height: rect.height
+            })
         }
     }
     // start parsong on the body of the preview container
-    parseDOM(siteFrame.body)
+    parseDOM(frameDocumentBody)
     return levelPlatforms
+}
+
+function getLowestPlatform(platforms) {
+    let lowestPlatform = platforms[0]
+    for (platform of platforms) {
+        if (lowestPlatform.y + lowestPlatform.height < platform.y + platform.height){
+            lowestPlatform = platform
+        }
+    }
+    return lowestPlatform
+}
+
+function getHighestPlatform(platforms) {
+    let highestPlatform = platforms[0]
+    for (platform of platforms) {
+        if (highestPlatform.y > platform.y){
+            highestPlatform = platform
+        }
+    }
+    return highestPlatform
 }
 
 var nextlink // goal trigger
 var gameLoop // game interval timer
+var ctx
+var canvas
 function generateLevel() {
-    // clear the previous drawing loop
-    clearInterval(gameLoop)
+    links = getDOMLinks(frameDocument())
+    nextlink = links[Math.floor(Math.random()*links.length)]
     // The platforms
-    let container = frameDocument()
-    let platforms = parseCurrentSite(container)
-    let canvasWidth = container.body.clientWidth,
-        canvasHeight = container.body.clientHeight
+    let frameDocumentBody = frameDocument().body
+    let platforms = parseCurrentSite(frameDocumentBody)
+    let lowestPlatform = getLowestPlatform(platforms)
+    let highestPlatform = getHighestPlatform(platforms)
+    let canvasWidth = frameDocumentBody.clientWidth,
+        canvasHeight = lowestPlatform.y + lowestPlatform.height
+
     // cleanup site preview
     let frameElement = previewFrame()
-    container.body.innerHTML = ''
     frameElement.style.height = '0px';
     frameElement.style.display = 'none';
+
+    for (let k = 0; k < platforms.length; k++) {
+        if (platforms[k].y > canvasHeight-200) {
+            platforms.pop(k)
+        }
+    }
     // spawn a bottom bounds platform
     platforms.push({
         x: 0,
-        y: canvasHeight-50,
+        y: canvasHeight-200,
         width: canvasWidth,
-        height: 200
+        height: 500
     })
+
     // The attributes of the player.
-    var player = {
-        x: 500,
-        y: 0,
+    let player = {
+        x: 100,
+        y: canvasHeight-280,
         x_v: 0,
         y_v: 0,
         jump : true,
         height: 80,
         width: 80
     }
-
-    var camera = {
-        pos: canvasHeight
+    // camera object to follow player
+    let camera = {
+        pos: 0
     }
     // The status of the arrow keys
-    var keys = {
+    let keys = {
         right: false,
         left: false,
         up: false,
     }
     // The friction and gravity to show realistic movements
-    var gravity = 1
-    var friction = 0.7
+    let gravity = 1
+    let friction = 0.7
 
     // Function to render
     function render(){
@@ -143,6 +187,13 @@ function generateLevel() {
                 platforms[i].height
             )
         }
+        ctx.fillStyle = "#FFFF00";
+        ctx.fillRect(
+            highestPlatform.x,
+            highestPlatform.y,
+            highestPlatform.width,
+            highestPlatform.height
+        )
     }
 
     function update() {
@@ -162,8 +213,8 @@ function generateLevel() {
         player.y += player.y_v;
         player.x += player.x_v;
 
-        camera.pos += ( player.y -400 - camera.pos )/10
         // Update the position of the camera relative to the player
+        camera.pos += ( player.y -400 - camera.pos )/10
         gameViewport().scrollTo(0, camera.pos);
         // A simple code that checks for collions with the platform
         let i = -1;
@@ -177,6 +228,10 @@ function generateLevel() {
         if (i > -1){
             player.jump = false;
             player.y = platforms[i].y - player.height;
+        }
+        if (platforms[i] == highestPlatform) {
+            urlInput().value = urlInput().value + '-->' +nextlink
+            loadPreviewSite( nextlink, frameDocument() )
         }
     }
 
@@ -203,12 +258,12 @@ function generateLevel() {
             keys.right = false;
     }
 
+    // Main Game Loop
     function loop() {
-        // update logic and collisions
-        update()
-        // Rendering the compoenents to the screen
-        render()
+        update() // update logic and collisions
+        render() // Rendering the compoenents to the screen
     }
+    
     // Set configurations for canvas
     canvas = document.getElementById("game-level-canvas");
     ctx = canvas.getContext("2d");
@@ -217,7 +272,11 @@ function generateLevel() {
     // Add event listeners for controls
     document.addEventListener("keydown", keydown);
     document.addEventListener("keyup", keyup);
+
     // start the game loop
+    loader().style.display = 'none'
+    previewFrame().style.filter = 'none'
+    canvas.style.display = 'block'
     gameLoop = setInterval(loop, 20);
 }
 
