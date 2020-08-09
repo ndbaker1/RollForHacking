@@ -169,7 +169,7 @@ function generateLevel() {
     // Function to render
     function render(){
         //Background
-        ctx.fillStyle = "#F0F8FF"
+        ctx.fillStyle = "#98F5FF"
         ctx.fillRect(0, 0, canvasWidth, canvasHeight)
         //Player as a square
         ctx.fillStyle = "#F08080";
@@ -180,13 +180,20 @@ function generateLevel() {
             player.height
         )
         //Platforms
-        ctx.fillStyle = "#45597E";
         for (let i = 0; i < platforms.length; i++){
+            ctx.fillStyle = "#855E42";
             ctx.fillRect(
                 platforms[i].x,
                 platforms[i].y,
                 platforms[i].width,
                 platforms[i].height
+            )
+            ctx.fillStyle = "#57a60f";
+            ctx.fillRect(
+                platforms[i].x,
+                platforms[i].y,
+                platforms[i].width,
+                9
             )
         }
         ctx.fillStyle = "#FFFF00";
