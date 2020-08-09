@@ -55,7 +55,7 @@ body {
     top: 30%;
     width: 80px;
     height: 80px;
-    color: #aaa;
+    color: #fff;
     font-size: xx-large;
     text-shadow: 1px black;
 }.lds-roller div {
@@ -69,7 +69,7 @@ body {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #aaa;
+    background: #fff;
     margin: -4px 0 0 -4px;
 }.lds-roller div:nth-child(1) {
     animation-delay: -0.036s;

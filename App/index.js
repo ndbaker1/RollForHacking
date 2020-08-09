@@ -31,7 +31,7 @@ function getDOMLinks(DOM) {
 function loadPreviewSite(url, frameDocument) {
     // change visibility of loader and blur site
     loader().style.display = 'inline-block'
-    previewFrame().style.filter = 'blur(3px) brightness(0.8)'
+    previewFrame().style.filter = 'blur(3px) brightness(0.7)'
     clearInterval(gameLoop)
     if (canvas !== undefined) canvas.style.display = 'none'
 
@@ -252,37 +252,40 @@ function generateLevel() {
         {
             //Collision
             let plat = platforms[i];
+            let hitPlat = false
             if(player.y+player.height > plat.y && player.y < plat.y+plat.height && player.x + player.x_v <= plat.x+plat.width && player.x > plat.x+plat.width)//bounce to right
             {
                 player.x_v = 7;
                 keys.left = false;
                 player.jump = true;
+                hitPlat = true;
             }
             if(player.y+player.height > plat.y && player.y < plat.y+plat.height && player.x + player.width + player.x_v >=plat.x && player.x+player.width < plat.x)//bounce to left
             {
                 player.x_v = -7;
                 keys.right = false;
                 player.jump = true;
+                hitPlat = true;
             }
             if(player.x+player.width > plat.x && player.x < plat.x+plat.width && player.y+player.height < plat.y+plat.height && player.y+player.height+player.y_v>=plat.y)//bounce up
             {
                 player.grounded = false;
                 player.y_v = player.y_v*-0.5;
                 player.jump = true;
-                //Finding goal
-                if (platforms[i] == highestPlatform) {
-                    urlInput().value = urlInput().value + '-->' +nextlink
-                    loadPreviewSite( nextlink, frameDocument() )
-                }
+                hitPlat = true;
+                
             }
             if(player.x+player.width > plat.x && player.x < plat.x+plat.width && player.y > plat.y+plat.height && player.y+player.y_v<=plat.y+plat.height)//bounce down
             {
                 player.y_v = 3;
+                hitPlat = true;
+            }
+            //Finding goal
+            if (platforms[i] == highestPlatform && hitPlat) {
+                urlInput().value = urlInput().value + '-->' +nextlink
+                loadPreviewSite( nextlink, frameDocument() )
             }
         }
-
-
-
     }
 
     function keydown(e) {
