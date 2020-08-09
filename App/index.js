@@ -104,7 +104,8 @@ function generateLevel() {
         y: 0,
         x_v: 0,
         y_v: 0,
-        jump : true,
+        jump : false,
+        grounded : true,
         height: 80,
         width: 80
     }
@@ -144,51 +145,86 @@ function generateLevel() {
                 platforms[i].width,
                 platforms[i].height
             )
+
+
+
+
+
+
         }
     }
 
     function update() {
+        //CAMERA LOGIC
+        camera.pos += ( player.y -400 - camera.pos )/10
+        // Update the position of the camera relative to the player
+        gameViewport().scrollTo(0, camera.pos);
+
         //PLAYER MOVEMENT
         // If the player is not jumping apply the effect of frictiom
-        if(player.jump == false)
+        if(player.grounded == false)
             player.x_v *= friction;
         else // If the player is in the air then apply the effect of gravity
             player.y_v += gravity;
 
-        player.jump = true;
+        player.grounded = true;
         // If the left key is pressed increase the relevant horizontal velocity
         if(keys.left)
-            player.x_v = -5;
+            player.x_v = -7;
         if(keys.right)
-            player.x_v = 5;
+            player.x_v = 7;
         
         // Updating the y and x coordinates of the player
         if(player.y + player.y_v < 0)
             player.y_v = 3;
         if(player.x < 0)
-            player.x_v = 5;
+        {
+            player.x_v = 7;
+            keys.left = false;
+            player.jump = true;
+        }
+            
         if(player.x+player.width > canvas.width)
-            player.x_v = -5;
+        {
+            player.x_v = -7;
+            keys.right = false;
+            player.jump = true;
+        }
+            
 
         player.y += player.y_v;
         player.x += player.x_v;
 
-        camera.pos += ( player.y -400 - camera.pos )/10
-        // Update the position of the camera relative to the player
-        gameViewport().scrollTo(0, camera.pos);
-        // A simple code that checks for collions with the platform
-        let i = -1;
-        for (let k = 0; k < platforms.length; k++){
-            if( platforms[k].x < player.x + player.width && player.x < platforms[k].x + platforms[k].width &&
-                platforms[k].y < player.y + player.height && player.y < platforms[k].y + platforms[k].height){
-                i = k;
-                break;
+        // COLLISION LOGIC
+        for(let i = 0; i < platforms.length; i++)
+        {
+            let plat = platforms[i];
+            if(player.y+player.height > plat.y && player.y < plat.y+plat.height && player.x + player.x_v <= plat.x+plat.width && player.x > plat.x+plat.width)//bounce to right
+            {
+                player.x_v = 7;
+                keys.left = false;
+                player.jump = true;
+            }
+            if(player.y+player.height > plat.y && player.y < plat.y+plat.height && player.x + player.width + player.x_v >=plat.x && player.x+player.width < plat.x)//bounce to left
+            {
+                player.x_v = -7;
+                keys.right = false;
+                player.jump = true;
+            }
+            if(player.x+player.width > plat.x && player.x < plat.x+plat.width && player.y+player.height < plat.y+plat.height && player.y+player.height+player.y_v>=plat.y)//bounce up
+            {
+                player.grounded = false;
+                player.y_v = player.y_v*-0.5;
+                player.jump = true;
+            }
+            if(player.x+player.width > plat.x && player.x < plat.x+plat.width && player.y > plat.y+plat.height && player.y+player.y_v<=plat.y+plat.height)//bounce down
+            {
+                player.y_v = 3;
             }
         }
-        if (i > -1){
-            player.jump = false;
-            player.y = platforms[i].y - player.height;
-        }
+
+
+
     }
 
     function keydown(e) {
@@ -197,8 +233,13 @@ function generateLevel() {
             keys.left = true;
         // 37 is the code for the up arrow key
         if(e.keyCode == 32)
-            if(player.jump == false)
+        {
+            if(player.jump == true)
+            {
+                player.jump = false;
                 player.y_v = -20;
+            }
+        }
         // 39 is the code for the right arrow key
         if(e.keyCode == 39) 
             keys.right = true;
@@ -207,9 +248,9 @@ function generateLevel() {
     function keyup(e) {
         if(e.keyCode == 37) 
             keys.left = false
-        if(e.keyCode == 32)
-            if(player.y_v < -2)
-                player.y_v = -5;
+        // if(e.keyCode == 32)
+        //     if(player.y_v < -2)
+        //         player.y_v = -5;
         if(e.keyCode == 39) 
             keys.right = false;
     }
