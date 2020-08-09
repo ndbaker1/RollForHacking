@@ -269,15 +269,15 @@ function generateLevel() {
                 player.grounded = false;
                 player.y_v = player.y_v*-0.5;
                 player.jump = true;
+                //Finding goal
+                if (platforms[i] == highestPlatform) {
+                    urlInput().value = urlInput().value + '-->' +nextlink
+                    loadPreviewSite( nextlink, frameDocument() )
+                }
             }
             if(player.x+player.width > plat.x && player.x < plat.x+plat.width && player.y > plat.y+plat.height && player.y+player.y_v<=plat.y+plat.height)//bounce down
             {
                 player.y_v = 3;
-            }
-            //Finding goal
-            if (platforms[i] == highestPlatform) {
-                urlInput().value = urlInput().value + '-->' +nextlink
-                loadPreviewSite( nextlink, frameDocument() )
             }
         }
 
