@@ -11,13 +11,8 @@ window.onload = function() {
         }
     })
     document.getElementById('how-to').addEventListener('click', () => { 
-        var msg = document.getElementById("myDiv");
-        if (msg.innerHTML === ""){
-            msg.innerHTML = "Press space to jump around. At the top of the map there is a yellow goal. Reach the goal to get to the next level!";
-        }
-        else{
-            msg.innerHTML = "";
-        }
+        var popup = document.getElementById("myPopup");
+        popup.classList.toggle("show");
     })
 }
 
