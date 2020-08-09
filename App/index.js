@@ -168,9 +168,10 @@ function generateLevel() {
 
     // Function to render
     function render(){
+        //Background
         ctx.fillStyle = "#F0F8FF"
         ctx.fillRect(0, 0, canvasWidth, canvasHeight)
-
+        //Player as a square
         ctx.fillStyle = "#F08080";
         ctx.fillRect(
             player.x,
@@ -178,6 +179,7 @@ function generateLevel() {
             player.width,
             player.height
         )
+        //Platforms
         ctx.fillStyle = "#45597E";
         for (let i = 0; i < platforms.length; i++){
             ctx.fillRect(
@@ -197,6 +199,7 @@ function generateLevel() {
     }
 
     function update() {
+        //PLAYER MOVEMENT
         // If the player is not jumping apply the effect of frictiom
         if(player.jump == false)
             player.x_v *= friction;
@@ -209,7 +212,15 @@ function generateLevel() {
             player.x_v = -5;
         if(keys.right)
             player.x_v = 5;
+        
         // Updating the y and x coordinates of the player
+        if(player.y + player.y_v < 0)
+            player.y_v = 3;
+        if(player.x < 0)
+            player.x_v = 5;
+        if(player.x+player.width > canvas.width)
+            player.x_v = -5;
+
         player.y += player.y_v;
         player.x += player.x_v;
 
@@ -240,7 +251,7 @@ function generateLevel() {
         if(e.keyCode == 37)
             keys.left = true;
         // 37 is the code for the up arrow key
-        if(e.keyCode == 38)
+        if(e.keyCode == 32)
             if(player.jump == false)
                 player.y_v = -20;
         // 39 is the code for the right arrow key
@@ -251,7 +262,7 @@ function generateLevel() {
     function keyup(e) {
         if(e.keyCode == 37) 
             keys.left = false
-        if(e.keyCode == 38)
+        if(e.keyCode == 32)
             if(player.y_v < -2)
                 player.y_v = -5;
         if(e.keyCode == 39) 

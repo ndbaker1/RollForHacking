@@ -1,3 +1,7 @@
+body {
+    background-color: #b3efd1;
+}
+
 .nav-box {
     padding: 15px;
     padding-bottom: 30px;
@@ -33,6 +37,7 @@
     height: 85vh;
     width: 95vw;
     box-shadow: grey 0 0 10px;
+    background-color:white;
 }
 
 #site-preview-frame {
@@ -115,4 +120,3 @@
         transform: rotate(360deg);
     }
 }
-  
