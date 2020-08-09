@@ -10,7 +10,12 @@ window.onload = function() {
             loadPreviewSite( urlInput().value, frameDocument() )
         }
     })
+    document.getElementById('how-to').addEventListener('click', () => { 
+        var popup = document.getElementById("myPopup");
+        popup.classList.toggle("show");
+    })
 }
+
 
 // element getters
 loader = () => { return document.getElementById('parsing-loader') }
