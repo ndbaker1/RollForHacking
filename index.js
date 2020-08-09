@@ -23,7 +23,6 @@ frameDocument = () => {
 }
 
 function getDOMLinks(DOM) {
-    console.log(DOM)
     const links = [].map.call(DOM.getElementsByTagName('a'), elem => elem.href)
     return links.filter(link => !link.includes('file'))
 }
