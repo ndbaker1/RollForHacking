@@ -149,8 +149,8 @@ function generateLevel() {
         y_v: 0,
         jump : false,
         grounded : true,
-        height: 80,
-        width: 80
+        height: 60,
+        width: 60
     }
     // camera object to follow player
     let camera = {
@@ -221,9 +221,9 @@ function generateLevel() {
         player.grounded = true;
         // If the left key is pressed increase the relevant horizontal velocity
         if(keys.left)
-            player.x_v = -7;
+            player.x_v = -12;
         if(keys.right)
-            player.x_v = 7;
+            player.x_v = 12;
         
         // Updating the y and x coordinates of the player
         if(player.y + player.y_v < 0)
