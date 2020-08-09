@@ -195,9 +195,10 @@ function generateLevel() {
         player.y += player.y_v;
         player.x += player.x_v;
 
-        // COLLISION LOGIC
+        // looping through platforms
         for(let i = 0; i < platforms.length; i++)
         {
+            //Collision
             let plat = platforms[i];
             if(player.y+player.height > plat.y && player.y < plat.y+plat.height && player.x + player.x_v <= plat.x+plat.width && player.x > plat.x+plat.width)//bounce to right
             {
@@ -220,6 +221,11 @@ function generateLevel() {
             if(player.x+player.width > plat.x && player.x < plat.x+plat.width && player.y > plat.y+plat.height && player.y+player.y_v<=plat.y+plat.height)//bounce down
             {
                 player.y_v = 3;
+            }
+            //Finding goal
+            if (platforms[i] == highestPlatform) {
+                urlInput().value = urlInput().value + '-->' +nextlink
+                loadPreviewSite( nextlink, frameDocument() )
             }
         }
 
